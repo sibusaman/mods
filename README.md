@@ -19,37 +19,79 @@
 
 You need to first install [node.js](https://docs.npmjs.com/getting-started/installing-node).
 
-Install the [http-server](https://www.npmjs.com/package/http-server) npm package. Including '-g' sets the installs the package gloabally, allowing you to use it as a command line tool:
+We install the [NVM](https://github.com/nvm-sh/nvm) (Node Version Manager) and install the node using NVM. This should work in all linux distributions.
 
-<code>npm install http-server -g</code>
+get the install script and run it
+```bash
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+
+bash install_nvm.sh # install
+```
+
+Add the NVM command to the shell
+
+```bash
+source ~/.profile
+```
+
+Now, install the version of NODE you want. The following will install the latest LTS version.
+
+```bash
+nvm install 10
+```
+
+Install 
+
+Install the [http-server](https://www.npmjs.com/package/http-server) npm package. Including '-g' sets the installs the package globally, allowing you to use it as a command line tool:
+
+```bash
+sudo npm install http-server -g
+```
 
 Clone the mods repository:
 
-<code>git clone ssh://git@gitlab.cba.mit.edu:846/pub/mods.git</code>
+```bash
+git clone https://gitlab.cba.mit.edu/pub/mods.git
+```
 
-Use the command line to navigate to the root of the mods repository:
+Use the command line to navigate to the root of the mods repository and start the server with
 
-<code>cd mods</code>
+```bash
+http-server
+```
+or
+```bash
+hs
+```
 
-Start up a server:
+Open a browser tab and go to ```127.0.0.1:8080``` which is the same as ```http://localhost:8080``` to view the server that you just started.
 
-<code>http-server</code>
+Depending on how to need to use mods you can start local servers located in ```mods/js```, for example, if you start from the root of the mods repository:
 
-Open a browser tab and go to <code>127.0.0.1:8080</code> which is the same as <code>http://localhost:8080</code> to view the server that you just started.
+```bash
+ cd js
+```
 
-Depending on how to need to use mods you can start local servers located in <code>mods/js</code>, for example, if you start from the root of the mods repository:
+and run servers
 
-<code>cd js</code>
+```bash
+node serialserver.js ::ffff:127.0.0.1 1234
+```
 
-<code>node printserver.js</code>
+For these servers you will need additional npm packages. You could install them locally within the mods repo. Navigate to the ```mods``` or ``` mods/js ``` and run (without the ```-g``` for local installation)
+
+```bash
+npm install serialport ws
+```
+
 
 # Mods Connection Debugging
 
-set correct serial port permission (do this each time you reboot the machine): <code>chmod a+rwx /dev/ttyUSB0</code>
+set correct serial port permission (do this each time you reboot the machine): ```chmod a+rwx /dev/ttyUSB0```
 
-start serialserver in the terminal so you can see the logs as it tries to connect.  navigate to the mods/js folder in the terminal (probably use <code>cd ~/mods/js</code>) and type: <code>node serialserver.js ::ffff:127.0.0.1 1234</code>
+start serialserver in the terminal so you can see the logs as it tries to connect.  navigate to the mods/js folder in the terminal (probably use ```cd ~/mods/js```) and type: ```node serialserver.js ::ffff:127.0.0.1 1234```
 
-check serialserver is running with: <code>ps aux | grep node</code>
+check serialserver is running with: ```ps aux | grep node```
 
 # Common Issues
 
