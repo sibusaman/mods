@@ -81,13 +81,13 @@ wss.on('connection',function(ws) {
             if (cancel) {
                console.log('cancel')
                ws.send('cancel')
-               fs.close(file)
+               fs.close(file, (err) => { if (err) throw err;} )
                }
             //
             // continue
             //
             else {
-               fs.write(file,job.contents[count],function(err,written,string) {
+               fs.write(file, job.contents[count], function(err,written,string) {
                   if (err) {
                      console.log('error '+err+' count '+count)
                      ws.send('error '+err+' count '+count)
@@ -100,7 +100,7 @@ wss.on('connection',function(ws) {
                      else {
                         console.log('done')
                         ws.send('done')
-                        fs.close(file)
+                        fs.close(file, (err) => { if (err) throw err;})
                         }
                      }
                   })
