@@ -544,7 +544,14 @@ window.addEventListener('contextmenu',function(evt){
       //
       // view project
       //
-      add_menu(div,'view project',function(evt){
+      add_menu(div,'view source in github',function(evt){
+         document.body.removeChild(evt.target.parentNode)
+         mods.ui.menu = null
+         var win = window.open('https://github.com/sibusaman/mods')
+         })
+      document.body.appendChild(div)
+      // original repo
+      add_menu(div,'mods upstream source',function(evt){
          document.body.removeChild(evt.target.parentNode)
          mods.ui.menu = null
          var win = window.open('https://gitlab.cba.mit.edu/pub/mods')
