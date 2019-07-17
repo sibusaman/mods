@@ -4,6 +4,8 @@
 // Neil Gershenfeld
 // (c) Massachusetts Institute of Technology 2018
 //
+// Modified by Sibu Saman https://github.com/sibusaman
+//
 // This work may be reproduced, modified, distributed, performed, and
 // displayed for any purpose, but must acknowledge the mods
 // project. Copyright is retained and must be preserved. The work is
@@ -37,31 +39,34 @@ mods.ui = {source:null,
    xstart:null,
    ystart:null,
    xtrans:null,
-   ytrans:null
+   ytrans:null,
+    maxzoom:4,
+    minzoom:.2
    }
-//
-// UI
-//
-document.body.style.overflow = "hidden"
-function mods_transform() {
-   var transform = document.body.style.transform
-   var index = transform.indexOf('scale')
-      var left = transform.indexOf('(',index)
-      var right = transform.indexOf(')',index)
-      var s = parseFloat(transform.slice(left+1,right))
-   var index = transform.indexOf('translate')
-      var left = transform.indexOf('(',index)
-      var right = transform.indexOf('px',left)
-      var tx = parseFloat(transform.slice(left+1,right))
-      var left = transform.indexOf(',',right)
-      var right = transform.indexOf('px',left)
-      var ty = parseFloat(transform.slice(left+1,right))
-   var origin = document.body.style.transformOrigin
+   //
+   // UI
+   //
+   document.body.style.overflow = "hidden"
+   document.body.style.fontFamily = "monospace"
+   function mods_transform() {
+      var transform = document.body.style.transform
+      var index = transform.indexOf('scale')
+      var left = transform.indexOf('(', index)
+      var right = transform.indexOf(')', index)
+      var s = parseFloat(transform.slice(left + 1, right))
+      var index = transform.indexOf('translate')
+      var left = transform.indexOf('(', index)
+      var right = transform.indexOf('px', left)
+      var tx = parseFloat(transform.slice(left + 1, right))
+      var left = transform.indexOf(',', right)
+      var right = transform.indexOf('px', left)
+      var ty = parseFloat(transform.slice(left + 1, right))
+      var origin = document.body.style.transformOrigin
       var pxx = origin.indexOf('px')
-      var ox = parseFloat(origin.slice(0,pxx))
-      var pxy = origin.indexOf('px',pxx+2)
-      var oy = parseFloat(origin.slice(pxx+2,pxy))
-   return({s:s,tx:tx,ty:ty,ox:ox,oy:oy})
+      var ox = parseFloat(origin.slice(0, pxx))
+      var pxy = origin.indexOf('px', pxx + 2)
+      var oy = parseFloat(origin.slice(pxx + 2, pxy))
+      return ({ s: s, tx: tx, ty: ty, ox: ox, oy: oy })
    }
 document.body.style.transform = 'scale(1) translate(0px,0px)'
 document.body.style.transformOrigin = '0px 0px'
@@ -84,9 +89,15 @@ window.addEventListener('wheel',function(evt) {
       evt.stopPropagation()
       var t = mods_transform()
       if (evt.deltaY > 0)
-         var scale = t.s*1.1
+      {
+          if (t.s < mods.ui.maxzoom)
+            var scale = t.s * 1.1
+      }
       else
-         var scale = t.s*0.9
+      {
+         if (t.s > mods.ui.minzoom)
+            var scale = t.s * 0.9
+      }
       var tx = t.tx+(evt.pageX-t.ox)*(1-1/t.s)
       var ty = t.ty+(evt.pageY-t.oy)*(1-1/t.s)
       document.body.style.transform = `scale(${scale}) translate(${tx}px,${ty}px)`
@@ -1755,62 +1766,62 @@ function input_mousedown(evt) {
       mods.ui.source = evt.target
       set_prompt('variable to link/unlink to?')
       }
-   else {
-      add_link(mods.ui.source,evt.target)
-      set_prompt('')
-      mods.ui.source = null
+      else {
+         add_link(mods.ui.source, evt.target)
+         set_prompt('')
+         mods.ui.source = null
       }
    }
-function input_touchdown(evt) {
-   if (mods.ui.source == null) {
-      mods.ui.source = evt.target
-      set_prompt('variable to link/unlink to?')
+   function input_touchdown(evt) {
+      if (mods.ui.source == null) {
+         mods.ui.source = evt.target
+         set_prompt('variable to link/unlink to?')
       }
-   else {
-      add_link(mods.ui.source,evt.target)
-      set_prompt('')
-      mods.ui.source = null
-      }
-   }
-//
-// output event handlers
-//
-function output_over(evt) {
-   evt.target.style.fontWeight = 'bold'
-   var links = JSON.parse(evt.target.dataset.links)
-   for (var l in links)
-      draw_link(links[l],mods.ui.link_highlight)
-   if (mods.ui.source == null)
-      set_prompt('click to link')
-   }
-function output_out(evt) {
-   evt.target.style.fontWeight = 'normal'
-   var links = JSON.parse(evt.target.dataset.links)
-   for (var l in links)
-      draw_link(links[l],mods.ui.link_color)
-   if (mods.ui.source == null)
-      set_prompt('')
-   }
-function output_mousedown(evt) {
-   if (mods.ui.source == null) {
-      mods.ui.source = evt.target
-      set_prompt('variable to link/unlink to?')
-      }
-   else {
-      add_link(mods.ui.source,evt.target)
-      set_prompt('')
-      mods.ui.source = null
+      else {
+         add_link(mods.ui.source, evt.target)
+         set_prompt('')
+         mods.ui.source = null
       }
    }
-function output_touchdown(evt) {
-   if (mods.ui.source == null) {
-      mods.ui.source = evt.target
-      set_prompt('variable to link/unlink to?')
+   //
+   // output event handlers
+   //
+   function output_over(evt) {
+      evt.target.style.fontWeight = 'bold'
+      var links = JSON.parse(evt.target.dataset.links)
+      for (var l in links)
+         draw_link(links[l], mods.ui.link_highlight)
+      if (mods.ui.source == null)
+         set_prompt('click to link')
+   }
+   function output_out(evt) {
+      evt.target.style.fontWeight = 'normal'
+      var links = JSON.parse(evt.target.dataset.links)
+      for (var l in links)
+         draw_link(links[l], mods.ui.link_color)
+      if (mods.ui.source == null)
+         set_prompt('')
+   }
+   function output_mousedown(evt) {
+      if (mods.ui.source == null) {
+         mods.ui.source = evt.target
+         set_prompt('variable to link/unlink to?')
       }
-   else {
-      add_link(mods.ui.source,evt.target)
-      set_prompt('')
-      mods.ui.source = null
+      else {
+         add_link(mods.ui.source, evt.target)
+         set_prompt('')
+         mods.ui.source = null
+      }
+   }
+   function output_touchdown(evt) {
+      if (mods.ui.source == null) {
+         mods.ui.source = evt.target
+         set_prompt('variable to link/unlink to?')
+      }
+      else {
+         add_link(mods.ui.source, evt.target)
+         set_prompt('')
+         mods.ui.source = null
       }
    }
 //
@@ -1826,89 +1837,89 @@ function name_out(evt) {
    if (mods.ui.source == null)
       set_prompt('')
    }
-function name_mousedown(evt) {
-   evt.preventDefault()
-   evt.stopPropagation()
-   var div = document.getElementById(evt.target.parentNode.id)
+   function name_mousedown(evt) {
+      evt.preventDefault()
+      evt.stopPropagation()
+      var div = document.getElementById(evt.target.parentNode.id)
       div.style.zIndex = 1
       mods.ui.xstart = evt.clientX
       mods.ui.ystart = evt.clientY
       mods.ui.selected[evt.target.parentNode.id] = true
-      window.addEventListener('mousemove',name_mousemove)
-      window.addEventListener('mouseup',name_mouseup)
+      window.addEventListener('mousemove', name_mousemove)
+      window.addEventListener('mouseup', name_mouseup)
    }
-function name_mousemove(evt) {
-   evt.preventDefault()
-   evt.stopPropagation()
-   var t = mods_transform()
-   for (var id in mods.ui.selected) {
-      var div = document.getElementById(id)
-         var dx = (evt.clientX-mods.ui.xstart)/t.s
-         var dy = (evt.clientY-mods.ui.ystart)/t.s
-         var newleft = parseFloat(div.dataset.left)+dx
-         var newtop = parseFloat(div.dataset.top)+dy
-         div.style.left = newleft+'px'
-         div.style.top = newtop+'px'
-      draw_links(id,mods.ui.link_color)
+   function name_mousemove(evt) {
+      evt.preventDefault()
+      evt.stopPropagation()
+      var t = mods_transform()
+      for (var id in mods.ui.selected) {
+         var div = document.getElementById(id)
+         var dx = (evt.clientX - mods.ui.xstart) / t.s
+         var dy = (evt.clientY - mods.ui.ystart) / t.s
+         var newleft = parseFloat(div.dataset.left) + dx
+         var newtop = parseFloat(div.dataset.top) + dy
+         div.style.left = newleft + 'px'
+         div.style.top = newtop + 'px'
+         draw_links(id, mods.ui.link_color)
       }
    }
-function name_mouseup(evt) {
-   evt.preventDefault()
-   evt.stopPropagation()
-   var t = mods_transform()
-   for (var id in mods.ui.selected) {
-      var div = document.getElementById(id)
+   function name_mouseup(evt) {
+      evt.preventDefault()
+      evt.stopPropagation()
+      var t = mods_transform()
+      for (var id in mods.ui.selected) {
+         var div = document.getElementById(id)
          div.style.zIndex = 0
          div.childNodes[0].style.fontWeight = 'normal'
-         var dx = (evt.clientX-mods.ui.xstart)/t.s
-         var dy = (evt.clientY-mods.ui.ystart)/t.s
-         div.dataset.left = parseFloat(div.dataset.left)+dx
-         div.dataset.top = parseFloat(div.dataset.top)+dy
-         window.removeEventListener('mousemove',name_mousemove)
-         window.removeEventListener('mouseup',name_mouseup)
+         var dx = (evt.clientX - mods.ui.xstart) / t.s
+         var dy = (evt.clientY - mods.ui.ystart) / t.s
+         div.dataset.left = parseFloat(div.dataset.left) + dx
+         div.dataset.top = parseFloat(div.dataset.top) + dy
+         window.removeEventListener('mousemove', name_mousemove)
+         window.removeEventListener('mouseup', name_mouseup)
       }
-   mods.ui.selected = {}
+      mods.ui.selected = {}
    }
-function name_touchdown(evt) {
-   evt.preventDefault()
-   evt.stopPropagation()
-   var div = document.getElementById(evt.target.parentNode.id)
+   function name_touchdown(evt) {
+      evt.preventDefault()
+      evt.stopPropagation()
+      var div = document.getElementById(evt.target.parentNode.id)
       div.style.zIndex = 1
       mods.ui.xstart = evt.changedTouches[0].pageX
       mods.ui.ystart = evt.changedTouches[0].pageY
       mods.ui.selected[evt.target.parentNode.id] = true
-      window.addEventListener('touchmove',name_touchmove)
-      window.addEventListener('touchend',name_touchup)
+      window.addEventListener('touchmove', name_touchmove)
+      window.addEventListener('touchend', name_touchup)
    }
-function name_touchmove(evt) {
-   evt.preventDefault()
-   evt.stopPropagation()
-   var t = mods_transform()
-   for (var id in mods.ui.selected) {
-      var div = document.getElementById(id)
-         var dx = (evt.changedTouches[0].pageX-mods.ui.xstart)/t.s
-         var dy = (evt.changedTouches[0].pageY-mods.ui.ystart)/t.s
-         var newleft = parseFloat(div.dataset.left)+dx
-         var newtop = parseFloat(div.dataset.top)+dy
-         div.style.left = newleft+'px'
-         div.style.top = newtop+'px'
-      draw_links(id,mods.ui.link_color)
+   function name_touchmove(evt) {
+      evt.preventDefault()
+      evt.stopPropagation()
+      var t = mods_transform()
+      for (var id in mods.ui.selected) {
+         var div = document.getElementById(id)
+         var dx = (evt.changedTouches[0].pageX - mods.ui.xstart) / t.s
+         var dy = (evt.changedTouches[0].pageY - mods.ui.ystart) / t.s
+         var newleft = parseFloat(div.dataset.left) + dx
+         var newtop = parseFloat(div.dataset.top) + dy
+         div.style.left = newleft + 'px'
+         div.style.top = newtop + 'px'
+         draw_links(id, mods.ui.link_color)
       }
    }
-function name_touchup(evt) {
-   evt.preventDefault()
-   evt.stopPropagation()
-   var t = mods_transform()
-   for (var id in mods.ui.selected) {
-      var div = document.getElementById(id)
+   function name_touchup(evt) {
+      evt.preventDefault()
+      evt.stopPropagation()
+      var t = mods_transform()
+      for (var id in mods.ui.selected) {
+         var div = document.getElementById(id)
          div.style.zIndex = 0
-         var dx = (evt.changedTouches[0].pageX-mods.ui.xstart)/t.s
-         var dy = (evt.changedTouches[0].pageY-mods.ui.ystart)/t.s
-         div.dataset.left = parseFloat(div.dataset.left)+dx
-         div.dataset.top = parseFloat(div.dataset.top)+dy
-         window.removeEventListener('touchmove',name_touchmove)
-         window.removeEventListener('touchend',name_touchup)
+         var dx = (evt.changedTouches[0].pageX - mods.ui.xstart) / t.s
+         var dy = (evt.changedTouches[0].pageY - mods.ui.ystart) / t.s
+         div.dataset.left = parseFloat(div.dataset.left) + dx
+         div.dataset.top = parseFloat(div.dataset.top) + dy
+         window.removeEventListener('touchmove', name_touchmove)
+         window.removeEventListener('touchend', name_touchup)
       }
-   mods.ui.selected = {}
+      mods.ui.selected = {}
    }
 })()
