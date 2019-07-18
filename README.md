@@ -89,8 +89,12 @@ npm install serialport ws
 ## Wrong SRM-20 Origin
 
 #### Problem : SRM-20 not moving to the real, machine origin when we ask it to move to x,y = 0,0
+
 #### Cause : The It appears that we are working in the user coordinate system of the machine. This is stored in the machine's EEPROM.
+
 #### Solution : As of now, we know we can change this from the V-Panel in Windows. So, open the V-Panel, move to machine-coordinate's origin, and then set this as the user-coordinate's origin. We will see if we can do this in Linux.
+
+##### Credits : [Ahmed-Khairy](https://github.com/ahmed-khairy)
 
 
 
